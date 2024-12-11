@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BOOKS 100
+#define MAX_TITLE_LENGTH 100
+
+char books[MAX_BOOKS][MAX_TITLE_LENGTH];
+char borrowedBooks[MAX_BOOKS][MAX_TITLE_LENGTH];
+int booksCount = 0;
+int borrowedBooksCount = 0;
+
+void clearScreen();
+void webHeader();
+void initializeBook();
+void borrowBook();
+void returnBook();
+void viewBorrowedBook();
+
+int main() {
+    initializeBook();
+    int pilihanMenu;
+
+    do {
+        clearScreen();
+        webHeader();
+        puts("Main Menu");
+        puts("=========");
+        puts("1. Pinjam Buku");
+        puts("2. Pengembalian Buku");
+        puts("3. Pinjaman Saya");
+        puts("4. Keluar");
+        puts("=========");
+        printf("Masukkan nomor: ");
+        scanf("%d", &pilihanMenu);
+        getchar();  
+        printf("\n");
+
+        switch (pilihanMenu) {
+            case 1:
+                borrowBook();
+                break;
+            case 2:
+                returnBook();
+                break;
+            case 3:
+                viewBorrowedBook();
+                break;
+            case 4:
+                clearScreen();
+                webHeader();
+                
+                puts("========================================");
+                puts("Terimakasih sudah menggunakan jasa kami.");
+                puts("========================================");
+                break;
+            default:
+                puts("Input salah. Silakan coba lagi.");
+                break;
+        }
+    } while (pilihanMenu != 4);
+
+    return 0;
+}
+
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void webHeader() {
+    const char *header  =   "  _      _ _                                               \n"
+                            " | |    (_) |                                              \n"
+                            " | |     _| |__  _ __ __ _ _ __ _   _   ___ ___  _ __ ___  \n"
+                            " | |    | | '_ \\| '__/ _` | '__| | | | / __/ _ \\| '_ ` _ \\ \n"
+                            " | |____| | |_) | | | (_| | |  | |_| || (_| (_) | | | | | |\n"
+                            " |______|_|_.__/|_|  \\\__,_|_|   \\\__, (_)___\\___/|_| |_| |_|\n"
+                            "                                 __/ |                     \n"
+                            "                                |___/                      \n";
+
+    printf("%s\n", header);
+}
+
+void initializeBook() {
+    strcpy(books[0], "Harry Potter");
+    strcpy(books[1], "Narnia");
+    strcpy(books[2], "Maze Runner");
+    strcpy(books[3], "Doraemon");
+    strcpy(books[4], "We Bare Bears");
+    strcpy(books[5], "Detective Conan");
+    strcpy(books[6], "Through My Window");
+    strcpy(books[7], "Ayahku Bukan Pembohong");
+    strcpy(books[8], "Laskar Pelangi");
+    strcpy(books[9], "Secret Life of Pets");
+
+    booksCount = 10;
+}
+
+void borrowBook() {
+    char bookTitle[MAX_TITLE_LENGTH];
+
+    clearScreen();
+    webHeader();
+
+    puts("Daftar Buku yang Tersedia");
+    puts("=========================");
+    for (int i = 0; i < booksCount; i++) {
+        printf("%s\n", books[i]);
+    }
+    puts("=========================");
+    printf("Judul buku yang ingin dipinjam: ");
+    scanf("%s[^\n]", bookTitle);
+
+    int bookIndex = -1;
+    for (int i = 0; i < booksCount; i++) {
+        if (strcasecmp(books[i], bookTitle) == 0) {
+            bookIndex = i;
+            break;
+        }
+    }
+
+    if (bookIndex != -1) {
+        strcpy(borrowedBooks[borrowedBooksCount++], books[bookIndex]);
+        for (int i = bookIndex; i < booksCount - 1; i++) {
+            strcpy(books[i], books[i + 1]);
+        }
+        booksCount--;
+        printf("\n== Buku berhasil dipinjam. ==\n\n");
+    } else {
+        printf("\n== Buku tidak tersedia. ==\n\n");
+    }
+}
+
+void returnBook() {
+    char bookTitle[MAX_TITLE_LENGTH];
+
+    clearScreen();
+    webHeader();
+
+    puts("Daftar Buku yang Sedang Dipinjam");
+    puts("================================");
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        printf("%s\n", borrowedBooks[i]);
+    }
+    puts("================================");
+    printf("Judul buku yang akan dikembalikan: ");
+    scanf("%s[^\n]", bookTitle);
+
+    int bookIndex = -1;
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        if (strcasecmp(borrowedBooks[i], bookTitle) == 0) {
+            bookIndex = i;
+            break;
+        }
+    }
+
+    if (bookIndex != -1) {
+        strcpy(books[booksCount++], borrowedBooks[bookIndex]);
+        for (int i = bookIndex; i < borrowedBooksCount - 1; i++) {
+            strcpy(borrowedBooks[i], borrowedBooks[i + 1]);
+        }
+        borrowedBooksCount--;
+        printf("\n== Buku berhasil dikembalikan. ==\n\n");
+    } else {
+        printf("\n== Buku tidak ditemukan dalam pinjaman. ==\n\n");
+    }
+}
+
+void viewBorrowedBook(){
+    char c;
+    
+    clearScreen();
+    webHeader();
+    
+	puts("Daftar Buku yang Sedang Dipinjam");
+	puts("================================");
+	if (borrowedBooksCount == 0){
+		printf("\n");
+		puts("Tidak ada buku yang sedang dipinjam.");
+		printf("\n");
+	} else {
+		for (int i = 0; i < borrowedBooksCount; i++){
+		printf("%s\n", borrowedBooks[i]);
+		}
+	}
+	puts("================================");
+	printf("\n");
+	
+	printf("Tekan tombol apa saja untuk melanjutkan\n");
+    getchar();
+}
