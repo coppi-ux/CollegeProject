@@ -1,0 +1,295 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BOOKS 100
+#define MAX_TITLE_LENGTH 100
+
+char books[MAX_BOOKS][MAX_TITLE_LENGTH];
+char borrowedBooks[MAX_BOOKS][MAX_TITLE_LENGTH];
+int booksCount = 0;
+int borrowedBooksCount = 0;
+
+void clear();
+void header();
+void initBooks();
+void borrow();
+void returnBook();
+void viewBorrowed();
+void sort(char array[MAX_BOOKS][MAX_TITLE_LENGTH], int count);
+void readFromFile();
+void writeToFile();
+void report();
+void invalidInput();
+
+int main() {
+    readFromFile();
+    int menuChoice;
+
+    do {
+        clear();
+        header();
+        puts("Main Menu");
+        puts("=========");
+        puts("1. Pinjam Buku");
+        puts("2. Pengembalian Buku");
+        puts("3. Pinjaman Saya");
+        puts("4. Generate Laporan");
+        puts("5. Keluar");
+        puts("=========");
+        printf("Masukkan nomor: ");
+        
+        if (scanf("%d", &menuChoice) != 1) {
+            invalidInput();
+            continue; 
+        }
+        getchar();  
+        printf("\n");
+
+        switch (menuChoice) {
+            case 1:
+                borrow();
+                break;
+            case 2:
+                returnBook();
+                break;
+            case 3:
+                viewBorrowed();
+                break;
+            case 4:
+                report();
+                break;
+            case 5:
+                clear();
+                header();
+                writeToFile();
+                puts("========================================");
+                puts("Terima kasih sudah menggunakan jasa kami.");
+                puts("========================================");
+                break;
+            default:
+                puts("Input salah. Silakan coba lagi.");
+                break;
+        }
+    } while (menuChoice != 5);
+
+    return 0;
+}
+
+void clear() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void header() {
+    const char *header  =   "  _      _ _                                               \n"
+                            " | |    (_) |                                              \n"
+                            " | |     _| |__  _ __ __ _ _ __ _   _   ___ ___  _ __ ___  \n"
+                            " | |    | | '_ \\\| '__/ _` | '__| | | | / __/ _ \\\| '_ ` _ \\\ \n"
+                            " | |____| | |_) | | | (_| | |  | |_| || (_| (_) | | | | | |\n"
+                            " |______|_|_.__/|_|  \\\__,_|_|   \\\__, (_)___\\___/|_| |_| |_|
+"
+                            "                                 __/ |                     \n"
+                            "                                |___/                      \n";
+
+    printf("%s\n", header);
+}
+
+void initBooks() {
+    strcpy(books[0], "Harry Potter");
+    strcpy(books[1], "Narnia");
+    strcpy(books[2], "Maze Runner");
+    strcpy(books[3], "Doraemon");
+    strcpy(books[4], "We Bare Bears");
+    strcpy(books[5], "Detective Conan");
+    strcpy(books[6], "Through My Window");
+    strcpy(books[7], "Ayahku Bukan Pembohong");
+    strcpy(books[8], "Laskar Pelangi");
+    strcpy(books[9], "Secret Life of Pets");
+
+    booksCount = 10;
+}
+
+void borrow() {
+    char bookTitle[MAX_TITLE_LENGTH];
+
+    clear();
+    header();
+
+    puts("Daftar Buku yang Tersedia");
+    puts("=========================");
+    for (int i = 0; i < booksCount; i++) {
+        printf("%s\n", books[i]);
+    }
+    puts("=========================");
+    printf("Judul buku yang ingin dipinjam: ");
+    scanf("%[^\n]", bookTitle);
+    getchar(); 
+
+    int bookIndex = -1;
+    for (int i = 0; i < booksCount; i++) {
+        if (strcasecmp(books[i], bookTitle) == 0) {
+            bookIndex = i;
+            break;
+        }
+    }
+
+    if (bookIndex != -1) {
+        strcpy(borrowedBooks[borrowedBooksCount++], books[bookIndex]);
+
+        for (int i = bookIndex; i < booksCount - 1; i++) {
+            strcpy(books[i], books[i + 1]);
+        }
+        booksCount--; 
+
+        sort(borrowedBooks, borrowedBooksCount); 
+
+        printf("\n== Buku berhasil dipinjam. ==\n\n");
+    } else {
+        printf("\n== Buku tidak tersedia. ==\n\n");
+    }
+}
+
+void returnBook() {
+    char bookTitle[MAX_TITLE_LENGTH];
+
+    clear();
+    header();
+
+    puts("Daftar Buku yang Sedang Dipinjam");
+    puts("================================");
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        printf("%s\n", borrowedBooks[i]);
+    }
+    puts("================================");
+    printf("Judul buku yang akan dikembalikan: ");
+    scanf("%[^\n]", bookTitle);
+    getchar(); 
+
+    int bookIndex = -1;
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        if (strcasecmp(borrowedBooks[i], bookTitle) == 0) {
+            bookIndex = i;
+            break;
+        }
+    }
+
+    if (bookIndex != -1) {
+        strcpy(books[booksCount++], borrowedBooks[bookIndex]);
+        for (int i = bookIndex; i < borrowedBooksCount - 1; i++) {
+            strcpy(borrowedBooks[i], borrowedBooks[i + 1]);
+        }
+        borrowedBooksCount--; 
+        sort(books, booksCount); 
+        printf("\n== Buku berhasil dikembalikan. ==\n\n");
+    } else {
+        printf("\n== Buku tidak ditemukan dalam pinjaman. ==\n\n");
+    }
+}
+
+void viewBorrowed() {
+    clear();
+    header();
+
+    puts("Daftar Buku yang Sedang Dipinjam");
+    puts("================================");
+    if (borrowedBooksCount == 0) {
+        puts("Tidak ada buku yang sedang dipinjam.");
+    } else {
+        for (int i = 0; i < borrowedBooksCount; i++) {
+            printf("%s\n", borrowedBooks[i]);
+        }
+    }
+    puts("================================");
+    printf("Tekan tombol apa saja untuk melanjutkan\n");
+    getchar();
+}
+
+void sort(char array[MAX_BOOKS][MAX_TITLE_LENGTH], int count) {
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (strcasecmp(array[j], array[j + 1]) > 0) {
+                char temp[MAX_TITLE_LENGTH];
+                strcpy(temp, array[j]);
+                strcpy(array[j], array[j + 1]);
+                strcpy(array[j + 1], temp);
+            }
+        }
+    }
+}
+
+void readFromFile() {
+    FILE *file = fopen("available_books.txt", "r");
+    if (file == NULL) {
+        initBooks(); 
+        return;
+    }
+
+    booksCount = 0;
+    while (fgets(books[booksCount], MAX_TITLE_LENGTH, file) != NULL) {
+        books[booksCount][strcspn(books[booksCount], "\n")] = '\0'; 
+        booksCount++;
+    }
+    fclose(file);
+}
+
+void writeToFile() {
+    FILE *availableFile = fopen("available_books.txt", "w");
+    if (availableFile == NULL) {
+        perror("Error opening file for writing");
+        return;
+    }
+
+    for (int i = 0; i < booksCount; i++) {
+        fprintf(availableFile, "%s\n", books[i]);
+    }
+    fclose(availableFile);
+
+    FILE *borrowedFile = fopen("borrowed_books.txt", "w");
+    if (borrowedFile == NULL) {
+        perror("Error opening file for writing");
+        return;
+    }
+
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        fprintf(borrowedFile, "%s\n", borrowedBooks[i]);
+    }
+    fclose(borrowedFile);
+}
+
+void report() {
+    clear();
+    header();
+
+    puts("Laporan Perpustakaan");
+    puts("====================");
+    printf("Jumlah buku tersedia: %d\n", booksCount);
+    printf("Jumlah buku dipinjam: %d\n", borrowedBooksCount);
+
+    puts("\nDaftar Buku Tersedia:");
+    puts("=====================");
+    for (int i = 0; i < booksCount; i++) {
+        printf("%s\n", books[i]);
+    }
+
+    puts("\nDaftar Buku Dipinjam:");
+    puts("=====================");
+    for (int i = 0; i < borrowedBooksCount; i++) {
+        printf("%s\n", borrowedBooks[i]);
+    }
+
+    puts("=====================");
+    printf("Tekan tombol apa saja untuk melanjutkan\n");
+    getchar();
+}
+
+void invalidInput() {
+    clear();
+    header();
+    puts("Input tidak valid. Masukkan angka yang sesuai.");
+    printf("Tekan tombol apa saja untuk melanjutkan\n");
+    getchar();
+}
