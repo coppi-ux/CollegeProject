@@ -1,0 +1,5 @@
+1,Gitar,Petik,Baru,100000,Tersedia
+2,ukelele,Petik,Baru,75000,Dipinjam
+3,Drumset,Perkusi,Baru,250000,Tersedia
+4,Trompet,Tiup,Baru,80000,Tersedia
+5,Speaker,Sound System,Baru,75000,Tersedia

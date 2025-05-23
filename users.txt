@@ -1,0 +1,6 @@
+
+copii,copi@1234,user
+copii,copii@1234,user
+admin1,admin@123,admin
+fira,pirarap1*,user
+miyahkanata,waf1bi$c,user
